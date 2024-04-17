@@ -123,15 +123,6 @@ func Mkdisk(parametros []string) {
 				return
 			}
 
-			// create array of byte(0)
-			/*
-				for i := 0; i < tam; i++ {
-					err := Herramientas.WriteObject(file, byte(0), int64(i))
-					if err != nil {
-						fmt.Println("Error: ", err)
-					}
-				}*/
-
 			datos := make([]byte, tam)
 			newErr := Herramientas.WriteObject(file, datos, 0)
 			if newErr != nil {

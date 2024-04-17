@@ -1,0 +1,26 @@
+#execute -path=prueba.txt
+
+#mkdisk -size=1 -unit=k -fit=wf
+
+#rmdisk -driveletter=B
+
+#Ingreso de particiones
+#fdisk -driveletter=A -unit=b -fit=ff -type=P -size=100 -name=Particion1
+#fdisk -driveletter=A -unit=b -fit=ff -type=P -size=100 -name=Particion2
+#fdisk -driveletter=A -unit=b -fit=ff -type=E -size=150 -name=Particion3
+#fdisk -driveletter=A -unit=b -fit=ff -type=P -size=200 -name=Particion4
+#fdisk -driveletter=A -unit=b -fit=ff -type=P -size=39 -name=Particion5
+
+#Eliminar particiones para pruebas
+#fdisk -size=283 -type=P -unit=b -fit=bf -driveletter=A -name=Particion1 -delete=full
+#fdisk -driveletter=A -delete=full -name=Particion2
+#fdisk -driveletter=A -delete=full -name=Particion3
+#fdisk -driveletter=A -delete=full -name=Particion4
+#fdisk -driveletter=A -delete=full -name=Particion5
+
+#Reducir/aumentar
+fdisk -add=50 -size=10 -unit=b -driveletter=A -name=Particion2
+
+#Reporte
+rep -id=A118 -path=/MIA/Reportes/mbrA.jpg -name=mbr
+rep -id=A118 -path=/MIA/Reportes/diskA.jpg -name=disk

@@ -31,26 +31,12 @@ func Rmdisk(parametros []string) {
 		}
 
 		//si existe realizar proceso de eliminacion
-
-		//Mensaaje de confirmacion para eliminar el archivo
-		fmt.Printf("¿Estás seguro de que quieres eliminar el disco %s? (s/n): ", letter)
-		var respuesta string
-		fmt.Scanln(&respuesta)
-
-		//Convertir la respuesta a minúsculas para permitir respuestas tanto en mayúsculas como en minúsculas
-		respuesta = strings.ToLower(respuesta)
-
-		// Validar la respuesta
-		if respuesta == "s" || respuesta == "si" {
-			err2 := os.Remove(path)
-			if err2 != nil {
-				fmt.Println("RMDISK Error: No pudo removerse el disco ")
-				return
-			}
-			fmt.Println("Disco ", letter, "eliminado correctamente:")
-		} else {
-			fmt.Println("Operación cancelada. El archivo no ha sido eliminado")
+		err2 := os.Remove(path)
+		if err2 != nil {
+			fmt.Println("RMDISK Error: No pudo removerse el disco ")
+			return
 		}
+		fmt.Println("Disco ", letter, "eliminado correctamente:")
 
 	} else {
 		fmt.Println("RMDISK Error: Parametro desconocido ", tmp[0])

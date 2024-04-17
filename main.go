@@ -12,29 +12,46 @@ import (
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/rs/cors"
 )
 
 type Entrada struct {
 	Text string `json:"text"`
 }
 
+type StatusResponse struct {
+	Message string `json:"message"`
+	Type    string `json:"type"`
+}
+
 func main() {
 	//metodos de uso
 	http.HandleFunc("/analizar", getCadenaAnalizar)
 	fmt.Println("Servidor escuchando en http://localhost:8080")
-	http.ListenAndServe(":8080", nil)
+	// Configurar CORS con opciones predeterminadas
+	c := cors.Default()
+
+	// Configurar el manejador HTTP con CORS
+	handler := c.Handler(http.DefaultServeMux)
+
+	// Iniciar el servidor en el puerto 8080
+	http.ListenAndServe(":8080", handler)
+	//http.ListenAndServe(":8080", nil)
 }
 
 func getCadenaAnalizar(w http.ResponseWriter, r *http.Request) {
 	// Configurar las cabeceras de la respuesta
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*") // Permitir solicitudes desde cualquier origen
-
+	//w.Header().Set("Access-Control-Allow-Origin", "*") // Permitir solicitudes desde cualquier origen
+	var status StatusResponse
 	//verificar que sea un post
 	if r.Method == http.MethodPost {
 		var entrada Entrada
 		if err := json.NewDecoder(r.Body).Decode(&entrada); err != nil {
 			http.Error(w, "Error al decodificar JSON", http.StatusBadRequest)
+			status = StatusResponse{Message: "Error al decodificar JSON", Type: "unsucces"}
+			json.NewEncoder(w).Encode(status)
 			return
 		}
 
@@ -53,9 +70,14 @@ func getCadenaAnalizar(w http.ResponseWriter, r *http.Request) {
 
 		//fmt.Println("Cadena recibida ", entrada.Text)
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Texto recibido correctamente"))
+
+		status = StatusResponse{Message: "recibido correctamente", Type: "succes"}
+		json.NewEncoder(w).Encode(status)
+
 	} else {
-		http.Error(w, "Metodo no permitido", http.StatusMethodNotAllowed)
+		//http.Error(w, "Metodo no permitido", http.StatusMethodNotAllowed)
+		status = StatusResponse{Message: "Metodo no permitido", Type: "unsucces"}
+		json.NewEncoder(w).Encode(status)
 	}
 }
 

@@ -1,0 +1,15 @@
+.entrada{
+    height: 400px;
+    resize: none;
+}
+
+.contenedorEjecutar{
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 5px;
+    padding-right: 5px;
+
+    display: flex;
+    justify-content:center;
+    gap: 5px; /* Espacio entre los elementos flexibles */
+}

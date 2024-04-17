@@ -1,0 +1,20 @@
+instalar react 
+npm install -g create-react-app
+
+Crear proyecto 
+npx create-react-app [nombre] 
+
+actualizar scripts
+npm install react-scripts@latest
+
+ejecutar front
+npm start
+
+Inicio de modificaciones
+en la carpeta src crear la carpeta Components
+
+instalar bootstrap
+npm install bootstrap
+
+por si diera la advertencia relacionada a babel @babel/plugin-proposal-private-property-in-object
+npm install --save-dev @babel/plugin-proposal-private-property-in-object
