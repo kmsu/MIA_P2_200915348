@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useParams } from 'react-router-dom';
 import { useNavigate } from "react-router-dom"
 import partIMG from '../iconos/part.png';
+import "../StyleSheets/fondo.css"
 
 export default function Partitions(){
     const { id } = useParams()
@@ -24,9 +25,10 @@ export default function Partitions(){
     }
 
     return(
-        <>
-            PARTICIONES EN EL DISCO {id} 
-           <div style={{display:"flex", flexDirection:"row"}}>
+        <div className='body'>
+            <div>&nbsp;&nbsp;&nbsp;</div>
+            <div style={{display:"flex", flexDirection:"row", justifyContent: "center"}}><h1>PARTICIONES EN EL DISCO {id} </h1></div>
+            <div style={{display:"flex", flexDirection:"row", justifyContent: "center"}}>
                 {particiones && particiones.length > 0 ? (
                     particiones.map((particion, index) => {
                         return (
@@ -35,6 +37,7 @@ export default function Partitions(){
                                 flexDirection: "column", // Alinea los elementos en columnas
                                 alignItems: "center", // Centra verticalmente los elementos
                                 maxWidth: "100px",
+                                margin: "10px"
                                 }}
                                 onClick={() => onClick(particion)}
                             >
@@ -47,7 +50,6 @@ export default function Partitions(){
                     <div>No hay particiones disponibles</div>
                 )}
             </div> 
-        </>
-        
+        </div> 
     );
 }
