@@ -18,3 +18,13 @@ npm install bootstrap
 
 por si diera la advertencia relacionada a babel @babel/plugin-proposal-private-property-in-object
 npm install --save-dev @babel/plugin-proposal-private-property-in-object
+
+NOTA: Modificar el archivo index
+import { createRoot } from 'react-dom/client';
+
+sustituir todo lo que forma parte de ReactDOM.render por 
+const root = createRoot(document.getElementById('root'));
+root.render(<App />);
+
+para la navegacion entre paginas instalar en la carpeta del front
+npm i react-router-dom 

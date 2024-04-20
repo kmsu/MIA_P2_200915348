@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func Login(parametros []string) {
+func Login(parametros []string) int32 {
 	fmt.Println("Login")
 	var user string //obligatorio
 	var pass string //obligatorio
@@ -55,7 +55,7 @@ func Login(parametros []string) {
 			//Validar que no haya usuario logeado
 			if Structs.UsuarioActual.Status {
 				fmt.Println("LOGIN ERROR: Ya existe una sesion iniciada, cierre sesion para iniciar otra")
-				return
+				return 0
 			}
 
 			//CARGAR EL DISCO DONDE PODRÍA ESTAR LA PARTICION
@@ -68,13 +68,13 @@ func Login(parametros []string) {
 			//abrir el disco que podría contener el id
 			disco, err := Herramientas.OpenFile(rutaDisco)
 			if err != nil {
-				return
+				return 1
 			}
 
 			//cargar el mbr
 			var mbr Structs.MBR
 			if err := Herramientas.ReadObject(disco, &mbr, 0); err != nil {
-				return
+				return 1
 			}
 
 			//cerrar el archivo del disco
@@ -97,7 +97,12 @@ func Login(parametros []string) {
 				err := Herramientas.ReadObject(disco, &superBloque, int64(mbr.Partitions[index].Start))
 				if err != nil {
 					fmt.Println("LOGIN Error. Particion sin formato")
-					return
+					return 1
+				}
+
+				if superBloque.S_filesystem_type == 0 {
+					fmt.Println("LOGIN Error. Particion sin formato")
+					return 2
 				}
 
 				//Se que el users.txt esta en el inodo 1
@@ -135,8 +140,9 @@ func Login(parametros []string) {
 									Structs.UsuarioActual.Status = true
 									fmt.Println("Inicio de sesion exitoso. \nBienvenido ", user)
 								} else {
-									loginFail = false
+									//loginFail = false
 									fmt.Println("LOGIN ERROR: Contraseña incorrecta")
+									return 3
 								}
 								break
 							}
@@ -146,6 +152,7 @@ func Login(parametros []string) {
 
 				if loginFail {
 					fmt.Println("LOGIN ERROR: No se encontro el usuario")
+					return 4
 				}
 			} else {
 				fmt.Println("LOGIN ERROR: Id no existe")
@@ -154,6 +161,7 @@ func Login(parametros []string) {
 			fmt.Println("LOGIN ERROR: Falta alguno de los siguientes parametros -> id, user o pass")
 		}
 	}
+	return -1 //No hay errores
 }
 
 func buscarIdGrp(lineaID []string, grupo string) {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import "../StyleSheets/ventanaComandos.css"
+import "../StyleSheets/comandos.css"
 
-export default function VentanaComando(){
+export default function Comandos(){
     const [textValue, setTextValue] = useState('');
 
     const handleTextChange = (event) => {
@@ -40,24 +40,26 @@ export default function VentanaComando(){
             <div id="espacio">&nbsp;&nbsp;&nbsp;</div>
 
             <table>
-                <tr>
-                    <td>
-                        <textarea
-                            className='entrada'
-                            value={textValue}
-                            onChange={handleTextChange}
-                            cols="80"
-                            rows="50"
-                            placeholder='Ingrese comandos'
-                        />
-                    </td>
-                </tr>
+                <tbody>
+                    <tr>
+                        <td>
+                            <textarea
+                                className='entrada'
+                                value={textValue}
+                                onChange={handleTextChange}
+                                cols="80"
+                                rows="50"
+                                placeholder='Ingrese comandos'
+                            />
+                        </td>
+                    </tr>
 
-                <tr>
-                    <td>
-                        <button type="button" className="btn btn-primary" onClick={(e) => sendData(e)}>Ejecutar</button>
-                    </td>
-                </tr>
+                    <tr>
+                        <td style={{textAlign:'center'}}>
+                            <button type="button" className="btn btn-primary" onClick={(e) => sendData(e)}>Ejecutar</button>
+                        </td>
+                    </tr>
+                </tbody>
             </table>
         </div>
     );

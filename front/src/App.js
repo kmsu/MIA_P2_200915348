@@ -1,17 +1,14 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
 
-import Navbar from './Components/navbar';
-import VentanaComando from './Components/ventanaComandos';
+import Navegador from './Components/navegador';
 
 class App extends Component {
   render() {
     return (
-      <div className="App">
-        <Navbar></Navbar>
-        <VentanaComando></VentanaComando>
-      </div>
+      //<div className="App">
+        <Navegador></Navegador>
+      //</div>
     );
   }
 }

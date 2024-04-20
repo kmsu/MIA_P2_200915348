@@ -6,11 +6,14 @@ import (
 	DM "MIA_P2_200915348/Comandos/AdministradorDiscos"  //DM -> DiskManagement (Administrador de discos)
 	FS "MIA_P2_200915348/Comandos/SistemaDeArchivos"    //FS -> FileSystem (sistema de archivos)
 	US "MIA_P2_200915348/Comandos/Users"                //US -> UserS
+	"MIA_P2_200915348/Herramientas"
+	"MIA_P2_200915348/Structs"
 	"bufio"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/rs/cors"
@@ -18,6 +21,12 @@ import (
 
 type Entrada struct {
 	Text string `json:"text"`
+}
+
+type Login struct {
+	User string `json:"usuario"`
+	Pass string `json:"password"`
+	Id   string `json:"id"`
 }
 
 type StatusResponse struct {
@@ -28,7 +37,10 @@ type StatusResponse struct {
 func main() {
 	//metodos de uso
 	http.HandleFunc("/analizar", getCadenaAnalizar)
-	fmt.Println("Servidor escuchando en http://localhost:8080")
+	http.HandleFunc("/discos", getDiscos)
+	http.HandleFunc("/particiones", getParticiones)
+	http.HandleFunc("/login", login)
+
 	// Configurar CORS con opciones predeterminadas
 	c := cors.Default()
 
@@ -36,14 +48,15 @@ func main() {
 	handler := c.Handler(http.DefaultServeMux)
 
 	// Iniciar el servidor en el puerto 8080
+	fmt.Println("Servidor escuchando en http://localhost:8080")
 	http.ListenAndServe(":8080", handler)
-	//http.ListenAndServe(":8080", nil)
 }
 
+// Ejecutar comandos
 func getCadenaAnalizar(w http.ResponseWriter, r *http.Request) {
-	// Configurar las cabeceras de la respuesta
+	// Configurar la cabecera de respuesta
 	w.Header().Set("Content-Type", "application/json")
-	//w.Header().Set("Access-Control-Allow-Origin", "*") // Permitir solicitudes desde cualquier origen
+
 	var status StatusResponse
 	//verificar que sea un post
 	if r.Method == http.MethodPost {
@@ -219,10 +232,6 @@ func analizar(entrada string) {
 			fmt.Println("REP ERROR: parametros no encontrados")
 		}
 
-	} else if strings.ToLower(parametros[0]) == "pause" {
-		fmt.Println("Presione enter para continuar...")
-		bufio.NewReader(os.Stdin).ReadBytes('\n')
-
 	} else if strings.ToLower(parametros[0]) == "exit" {
 		fmt.Println("Salida exitosa")
 		os.Exit(0)
@@ -232,5 +241,111 @@ func analizar(entrada string) {
 	} else {
 		fmt.Println("Comando no reconocible")
 	}
+}
 
+func getDiscos(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("discos")
+	// Configurar la cabecera de respuesta
+	w.Header().Set("Content-Type", "application/json")
+
+	directorio := "./MIA/P1"
+	//lista de discos encontrados
+	var discos []string
+
+	//recorrer el directorio y buscar discos
+	err := filepath.Walk(directorio, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() {
+			discos = append(discos, info.Name())
+		}
+		return nil
+	})
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error al buscar archivos: %s", err), http.StatusInternalServerError)
+	}
+
+	respuestaJSON, err := json.Marshal(discos)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error al serializar datos a JSON: %s", err), http.StatusInternalServerError)
+		return
+	}
+	w.Write(respuestaJSON)
+}
+
+func getParticiones(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Particiones")
+	// Configurar la cabecera de respuesta
+	w.Header().Set("Content-Type", "application/json")
+
+	var entrada string
+	if err := json.NewDecoder(r.Body).Decode(&entrada); err != nil {
+		http.Error(w, "Error al decodificar JSON", http.StatusBadRequest)
+		return
+	}
+
+	filepath := "./MIA/P1/" + entrada
+
+	disco, err := Herramientas.OpenFile(filepath)
+	if err != nil {
+		fmt.Println("MOUNT Error: No se pudo leer el disco")
+		return
+	}
+
+	//Se crea un mbr para cargar el mbr del disco
+	var mbr Structs.MBR
+	//Guardo el mbr leido
+	if err := Herramientas.ReadObject(disco, &mbr, 0); err != nil {
+		return
+	}
+
+	// cerrar el archivo del disco
+	defer disco.Close()
+
+	//lista de discos encontrados
+	var particiones []string
+
+	for i := 0; i < 4; i++ {
+		estado := string(mbr.Partitions[i].Status[:])
+		if estado == "A" {
+			particiones = append(particiones, string(mbr.Partitions[i].Id[:]))
+		}
+	}
+
+	fmt.Println("Montadas ", particiones)
+	respuestaJSON, err := json.Marshal(particiones)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error al serializar datos a JSON: %s", err), http.StatusInternalServerError)
+		return
+	}
+	w.Write(respuestaJSON)
+}
+
+func login(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("login")
+	// Configurar la cabecera de respuesta
+	w.Header().Set("Content-Type", "application/json")
+
+	var entrada Login
+	if err := json.NewDecoder(r.Body).Decode(&entrada); err != nil {
+		http.Error(w, "Error al decodificar JSON", http.StatusBadRequest)
+		return
+	}
+
+	fmt.Println("User ", entrada.User)
+	fmt.Println("Pass ", entrada.Pass)
+	fmt.Println("Id ", entrada.Id)
+	//Construir cadena para ejecutar el comando login
+	//login -user=root -pass=123 -id=A148
+
+	logear := [4]string{"login", "user=" + entrada.User, "pass=" + entrada.Pass, "id=" + entrada.Id}
+	fmt.Println("logear ", logear)
+
+	respuestaJSON, err := json.Marshal(US.Login(logear[:]))
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error al serializar datos a JSON: %s", err), http.StatusInternalServerError)
+		return
+	}
+	w.Write(respuestaJSON)
 }

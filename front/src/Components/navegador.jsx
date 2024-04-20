@@ -1,23 +1,14 @@
-import React, { useState } from 'react';
 import hacker from '../iconos/hacker.gif';
+
+import { Routes, Route, HashRouter, Link } from 'react-router-dom'
 import Comandos from '../Paginas/comandos';
-import Explorer from '../Paginas/discos';
+import Discos from '../Paginas/discos';
+import Partitions from '../Paginas/partition';
+import Login from '../Paginas/login';
 
-export default function Navbar(){
-    const [componenteActivo, setComponenteActivo] = useState(<Comandos/>);
-
-    function comandos(idPagina){
-        let componente
-        if (idPagina === 1){
-            componente =  <Comandos/>
-        }else if (idPagina === 2){
-            componente = <Explorer/>
-        }
-        setComponenteActivo(componente)
-    }
-
+export default function Navegador(){
     return(
-        <>
+        <HashRouter>
             <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
                 {/*COLUMNAS*/}
                 <div id="espacio">&nbsp;&nbsp;&nbsp;</div>
@@ -39,15 +30,16 @@ export default function Navbar(){
                             <ul className="navbar-nav me-auto">
                                 {/*LISTA DE MENUS QUE ESTARAN EN LA BARRA DE NAVEGACION*/}
                                 <li className="nav-item">
-                                    <a className="nav-link active" type="button" onClick={() => comandos(1)}>Comandos</a>
+                                    {/* Utiliza Link en lugar de a para navegar entre rutas */}
+                                    <Link className="nav-link active" to="/Comandos">Comandos</Link>
                                 </li>
 
                                 <li className="nav-item">
-                                    <a className="nav-link" type="button" onClick={() => comandos(2)}>Explorador</a>
+                                    <Link className="nav-link" to="/Discos">Explorador</Link>
                                 </li>
 
                                 <li className="nav-item">
-                                    <a className="nav-link" type="submit">Logout</a>
+                                    <Link className="nav-link" to="/Logout">Logout</Link>
                                 </li>
 
                             </ul>{/*Fin de lista de menus*/}
@@ -55,8 +47,14 @@ export default function Navbar(){
                     </div>{/*Fila Titulo*/}
                 </div>{/*Cierro tercer columna (Menu)*/}
             </nav> 
-            {componenteActivo}
-        </>
+
+            <Routes>
+                <Route path="/" element ={<Comandos/>}/> {/*home*/}
+                <Route path="/Comandos" element ={<Comandos/>}/> 
+                <Route path="/Discos" element ={<Discos/>}/> 
+                <Route path="/Disco/:id" element ={<Partitions/>}/> 
+                <Route path="/Login/:disk/:part" element ={<Login/>}/>                 
+            </Routes>
+        </HashRouter>
     );
 }
-
