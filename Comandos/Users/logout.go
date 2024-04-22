@@ -5,12 +5,12 @@ import (
 	"fmt"
 )
 
-func Logout() {
+func Logout() int32 {
 	fmt.Println("Logout")
 	//Validar que haya usuario logeado
 	if !Structs.UsuarioActual.Status {
 		fmt.Println("LOGOUT ERROR: No existe una sesion iniciada")
-		return
+		return 1
 	}
 	//Cierra sesion
 	Structs.UsuarioActual.Status = false
@@ -20,4 +20,5 @@ func Logout() {
 	Structs.UsuarioActual.IdGrp = 0
 	Structs.UsuarioActual.IdUsr = 0
 	Structs.UsuarioActual.Nombre = ""
+	return 0
 }

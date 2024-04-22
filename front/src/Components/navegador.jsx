@@ -1,12 +1,36 @@
-import hacker from '../iconos/hacker.gif';
-
 import { Routes, Route, HashRouter, Link } from 'react-router-dom'
+
+import hacker from '../iconos/hacker.gif';
 import Comandos from '../Paginas/comandos';
 import Discos from '../Paginas/discos';
 import Partitions from '../Paginas/partition';
 import Login from '../Paginas/login';
+import Explorer from '../Paginas/explorador';
 
 export default function Navegador(){
+
+    const logOut = (e) => {
+        e.preventDefault()
+        const data = {
+            text: "logout"
+        };
+
+        fetch('http://localhost:8080/logout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        })
+        .then(Response => Response.json())
+        .then(rawData => {
+            console.log(rawData); 
+            if (rawData === 0){
+                alert('sesion cerrada')
+            }else{
+                alert('No hay sesion abierta')
+            }
+        }) 
+    };
+
     return(
         <HashRouter>
             <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -39,7 +63,7 @@ export default function Navegador(){
                                 </li>
 
                                 <li className="nav-item">
-                                    <Link className="nav-link" to="/Logout">Logout</Link>
+                                    <button onClick={logOut} className="nav-link">Logout</button>
                                 </li>
 
                             </ul>{/*Fin de lista de menus*/}
@@ -47,14 +71,17 @@ export default function Navegador(){
                     </div>{/*Fila Titulo*/}
                 </div>{/*Cierro tercer columna (Menu)*/}
             </nav> 
-
+            
             <Routes>
                 <Route path="/" element ={<Comandos/>}/> {/*home*/}
                 <Route path="/Comandos" element ={<Comandos/>}/> 
                 <Route path="/Discos" element ={<Discos/>}/> 
                 <Route path="/Disco/:id" element ={<Partitions/>}/> 
-                <Route path="/Login/:disk/:part" element ={<Login/>}/>                 
+                <Route path="/Login/:disk/:part" element ={<Login/>}/>
+                <Route path="/Explorador/:id" element ={<Explorer/>}/>                 
             </Routes>
         </HashRouter>
+
+        
     );
 }

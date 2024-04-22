@@ -1,0 +1,15 @@
+.container{
+    height: 100%;
+    align-content: center;
+}
+
+.container-with-scroll {
+    width: 100%; /* Ancho deseado */
+    max-height: 350px; /* Altura deseada */
+    overflow-y: auto; /* Habilitar el desplazamiento vertical */
+    color: white;
+    background-color: rgba(0,0,0,0.5) !important;
+    margin-top: 10%;
+    margin-bottom: auto;
+    flex-wrap: wrap;
+}

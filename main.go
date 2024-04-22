@@ -9,6 +9,7 @@ import (
 	"MIA_P2_200915348/Herramientas"
 	"MIA_P2_200915348/Structs"
 	"bufio"
+	"encoding/binary"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -40,6 +41,8 @@ func main() {
 	http.HandleFunc("/discos", getDiscos)
 	http.HandleFunc("/particiones", getParticiones)
 	http.HandleFunc("/login", login)
+	http.HandleFunc("/logout", logout)
+	http.HandleFunc("/explorer", getContenido)
 
 	// Configurar CORS con opciones predeterminadas
 	c := cors.Default()
@@ -343,6 +346,89 @@ func login(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("logear ", logear)
 
 	respuestaJSON, err := json.Marshal(US.Login(logear[:]))
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error al serializar datos a JSON: %s", err), http.StatusInternalServerError)
+		return
+	}
+	w.Write(respuestaJSON)
+}
+
+func logout(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("logout")
+	// Configurar la cabecera de respuesta
+	w.Header().Set("Content-Type", "application/json")
+
+	respuestaJSON, err := json.Marshal(US.Logout())
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error al serializar datos a JSON: %s", err), http.StatusInternalServerError)
+		return
+	}
+	w.Write(respuestaJSON)
+}
+
+func getContenido(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("contenido")
+	// Configurar la cabecera de respuesta
+	w.Header().Set("Content-Type", "application/json")
+
+	id := Structs.UsuarioActual.Id
+	disk := id[0:1]
+	//abrir disco a reportar
+	carpeta := "./MIA/P1/" //Ruta (carpeta donde se leera el disco)
+	extension := ".dsk"
+	rutaDisco := carpeta + disk + extension
+
+	disco, err := Herramientas.OpenFile(rutaDisco)
+	if err != nil {
+		return
+	}
+
+	//Se crea un mbr para cargar el mbr del disco
+	var mbr Structs.MBR
+	//Guardo el mbr leido
+	if err := Herramientas.ReadObject(disco, &mbr, 0); err != nil {
+		return
+	}
+
+	// cerrar el archivo del disco
+	defer disco.Close()
+
+	part := -1
+	for i := 0; i < 4; i++ {
+		identificador := Structs.GetId(string(mbr.Partitions[i].Id[:]))
+		if identificador == id {
+			part = i
+			break //para que ya no siga recorriendo si ya encontro la particion independientemente si se pudo o no reducir
+		}
+	}
+
+	var superBloque Structs.Superblock
+	Herramientas.ReadObject(disco, &superBloque, int64(mbr.Partitions[part].Start))
+
+	var Inode0 Structs.Inode
+	Herramientas.ReadObject(disco, &Inode0, int64(superBloque.S_inode_start))
+
+	//lista de discos encontrados
+	var contenido []string
+
+	var folderBlock Structs.Folderblock
+	for i := 0; i < 12; i++ {
+		idBloque := Inode0.I_block[i]
+		if idBloque != -1 {
+			Herramientas.ReadObject(disco, &folderBlock, int64(superBloque.S_block_start+(idBloque*int32(binary.Size(Structs.Folderblock{})))))
+			//Recorrer el bloque actual buscando la carpeta/archivo en la raiz
+			for j := 2; j < 4; j++ {
+				//apuntador es el apuntador del bloque al inodo (carpeta/archivo), si existe es distinto a -1
+				apuntador := folderBlock.B_content[j].B_inodo
+				if apuntador != -1 {
+					pathActual := Structs.GetB_name(string(folderBlock.B_content[j].B_name[:]))
+					contenido = append(contenido, pathActual)
+				}
+			}
+		}
+	}
+
+	respuestaJSON, err := json.Marshal(contenido)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error al serializar datos a JSON: %s", err), http.StatusInternalServerError)
 		return

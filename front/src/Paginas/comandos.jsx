@@ -50,6 +50,7 @@ export default function Comandos(){
                                 cols="80"
                                 rows="50"
                                 placeholder='Ingrese comandos'
+                                id='inputComands'
                             />
                         </td>
                     </tr>

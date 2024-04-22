@@ -1,9 +1,14 @@
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useState } from "react";
+
+import "../StyleSheets/login.css"
+import user from '../iconos/profile.png';
+import key from '../iconos/key.png';
 
 export default function Login(){
     const { disk, part } = useParams()
-    const [ errores, setErrores ] = useState();
+    const [ estado, setEstado ] = useState();
+    const navigate = useNavigate()
 
     const handleSubmit = (e) => {
         e.preventDefault()
@@ -26,56 +31,91 @@ export default function Login(){
             body: JSON.stringify(data)
         })
         .then(Response => Response.json())
-        .then(rawData => {console.log(rawData); setErrores(rawData);})
+        .then(rawData => {
+            console.log(rawData); 
+            setEstado(rawData);
+            if (rawData === -1){
+                onClick(part)
+            }
+        })
+    }
+
+    const onClick = (particion) => {
+        console.log("nueva pagina",particion)
+        navigate(`/explorador/${particion}`)
     }
 
     return(
         <>
-            <form onSubmit={handleSubmit}>
-                <section className="vh-100" style={{backgroundColor: '#508bfc'}}>
-                <div className="container py-5 h-100">
-                    <div className="row d-flex justify-content-center align-items-center h-100">
-                    <div className="col-12 col-md-8 col-lg-6 col-xl-5">
-                        <div className="card shadow-2-strong" style={{borderRadius: "1rem"}}>
-                        <div className="card-body p-5 text-center">
-
-                            <h3 className="mb-5">Sign in</h3>
-
-                            <div data-mdb-input-init className="form-outline mb-4">
-                            <input type="text" className="form-control form-control-lg" placeholder="Enter Username" name="uname" required/>
-                            <label className="form-label">User</label>
-                            </div>
-
-                            <div data-mdb-input-init className="form-outline mb-4">
-                            <input type="password" placeholder="Enter Password" className="form-control form-control-lg" name="psw" required/>
-                            <label className="form-label" >Password</label>
-                            </div>
-
-                            <button data-mdb-button-init data-mdb-ripple-init className="btn btn-primary btn-lg btn-block" type="submit">Login</button>
-
+            <div className="container">
+                <div className="d-flex justify-content-center">
+                    <div className="card ">
+                        <div className="card-header">
+                            <h3>Sign In</h3>
                         </div>
+                        <div className="card-body">
+                            <form onSubmit={handleSubmit}>
+                                <div className="input-group form-group">
+                                    <div className="input-group-prepend">
+                                        <span className="input-group-text" style={{padding: '0', marginRight:'10px'}}>
+                                            <img src={user} alt="user" style={{width: '100%', height: '100%'}} />
+                                        </span>
+                                    </div>
+                                    <input type="text" className="form-control" placeholder="username" name="uname" required/>
+                                </div>
+                                
+                                <div>&nbsp;&nbsp;&nbsp;</div>
+                                
+                                <div className="input-group form-group">
+                                    <div className="input-group-prepend">
+                                        <span className="input-group-text" style={{padding: '0', marginRight:'10px'}}>
+                                            <img src={key} alt="user" style={{width: '100%', height: '100%'}} />
+                                        </span>
+                                    </div>
+                                    <input type="password" className="form-control" placeholder="password" name="psw" required/>
+                                </div>
+
+                                <div>&nbsp;&nbsp;&nbsp;</div>
+                                
+                                <div style={{textAlign:'center'}}>
+                                    <button type="submit" className="btn btn-primary login_btn">Login</button>
+                                </div>
+                            </form>
+
+                            <div>&nbsp;&nbsp;&nbsp;</div>
+
+                            <div className='estadoLogin'>
+                                {estado === 0 ? (
+                                    <div>Ya existe sesion activa</div>
+                                ):estado === 2 ?(
+                                    <div>Particion sin formato</div>
+                                ):estado === 3 ?(
+                                    <div>Contraseña incorrecta</div>
+                                ):estado === 4 ?(
+                                    <div>No se encontro el usuario</div>
+                                ):(
+                                    <div></div>
+                                )}
+                            </div>
+                            
                         </div>
-                    </div>
                     </div>
                 </div>
-                </section>
-            </form>
-
-            {errores  === -1 ? (
-                <div>bienvenido </div>
-                //Abrir sistema de archivos (mostrar carpeta raiz)
-            ):errores === 0 ? (
-                alert('Ya existe sesion activa')
-            ):errores === 2 ?(
-                alert('Particion sin formato')
-            ):errores === 3 ?(
-                alert('Contraseña incorrecta')
-            ):errores === 4 ?(
-                alert('No se encontro el usuario')
-            ):(
-                <div></div>
-            )}
-           
+            </div>
         </>
     )
 }
+
+{/**{estado  === -1 ? (
+                                    onClick(part)
+                                ):estado === 0 ? (
+                                    <div>Ya existe sesion activa</div>
+                                ):estado === 2 ?(
+                                    <div>Particion sin formato</div>
+                                ):estado === 3 ?(
+                                    <div>Contraseña incorrecta</div>
+                                ):estado === 4 ?(
+                                    <div>No se encontro el usuario</div>
+                                ):(
+                                    <div></div>
+                                )} */}
