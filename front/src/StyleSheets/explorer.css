@@ -19,6 +19,7 @@
 
 .container-with-scroll {
     width: 100%; /* Ancho deseado */
+    min-height: 200px;
     max-height: 350px; /* Altura deseada */
     overflow-y: auto; /* Habilitar el desplazamiento vertical */
     color: white;

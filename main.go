@@ -45,6 +45,7 @@ func main() {
 	http.HandleFunc("/logout", logout)
 	http.HandleFunc("/explorer", getContenido)
 	http.HandleFunc("/contenido", getContenidoR)
+	http.HandleFunc("/file", getFile)
 	http.HandleFunc("/back", getBack)
 
 	// Configurar CORS con opciones predeterminadas
@@ -472,6 +473,8 @@ func getContenidoR(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
+	// Close bin file
+	defer disco.Close()
 
 	var superBloque Structs.Superblock
 	Herramientas.ReadObject(disco, &superBloque, initSuperBloque)
@@ -505,6 +508,67 @@ func getContenidoR(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	respuestaJSON, err := json.Marshal(contenido)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error al serializar datos a JSON: %s", err), http.StatusInternalServerError)
+		return
+	}
+	w.Write(respuestaJSON)
+}
+
+func getFile(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("file")
+	// Configurar la cabecera de respuesta
+	w.Header().Set("Content-Type", "application/json")
+
+	var entrada string
+	if err := json.NewDecoder(r.Body).Decode(&entrada); err != nil {
+		http.Error(w, "Error al decodificar JSON", http.StatusBadRequest)
+		return
+	}
+
+	fmt.Println("Buscar ", entrada)
+
+	id := Structs.UsuarioActual.Id
+	disk := id[0:1]
+	//abrir disco a reportar
+	carpeta := "./MIA/P1/" //Ruta (carpeta donde se leera el disco)
+	extension := ".dsk"
+	rutaDisco := carpeta + disk + extension
+
+	disco, err := Herramientas.OpenFile(rutaDisco)
+	if err != nil {
+		return
+	}
+	// Close bin file
+	defer disco.Close()
+
+	var superBloque Structs.Superblock
+	Herramientas.ReadObject(disco, &superBloque, initSuperBloque)
+
+	//agrego el actual a la pila de anteriores (este sera el anterior)
+	listaAnterior = append(listaAnterior, idActual)
+	//busco en el actual
+	idActual = HerramientasInodos.BuscarInodo(idActual, "/"+entrada, superBloque, disco)
+
+	//cargo el inodo actual
+	var Inode Structs.Inode
+	Herramientas.ReadObject(disco, &Inode, int64(superBloque.S_inode_start+(idActual*int32(binary.Size(Structs.Inode{})))))
+
+	//lista de discos encontrados
+	var contenido []string
+	var textFile string
+	var fileBlock Structs.Fileblock
+
+	for _, idBlock := range Inode.I_block {
+		if idBlock != -1 {
+			Herramientas.ReadObject(disco, &fileBlock, int64(superBloque.S_block_start+(idBlock*int32(binary.Size(Structs.Fileblock{})))))
+			textFile += string(fileBlock.B_content[:])
+		}
+	}
+
+	contenido = append(contenido, textFile)
+	fmt.Println("Contenido archivo ", contenido[0])
 	respuestaJSON, err := json.Marshal(contenido)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error al serializar datos a JSON: %s", err), http.StatusInternalServerError)
