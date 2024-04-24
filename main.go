@@ -713,4 +713,73 @@ func getLimpieza(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("limpieza")
 	// Configurar la cabecera de respuesta
 	w.Header().Set("Content-Type", "application/json")
+
+	//Eliminacion de discos
+	carpetaDiscos := "./MIA/P1"
+
+	//abre la carpeta
+	directorio, err := os.Open(carpetaDiscos)
+	if err != nil {
+		fmt.Println("Error al abrir la carpeta:", err)
+		return
+	}
+	defer directorio.Close()
+
+	// Lee los archivos de la carpeta
+	archivos, err := directorio.Readdir(0)
+	if err != nil {
+		fmt.Println("Error al leer archivos de la carpeta:", err)
+		return
+	}
+
+	// Elimina cada archivo
+	for _, archivo := range archivos {
+		rutaArchivo := carpetaDiscos + "/" + archivo.Name()
+		err := os.Remove(rutaArchivo)
+		if err != nil {
+			fmt.Println("Error al eliminar el archivo", archivo.Name(), ":", err)
+		} else {
+			fmt.Println("Archivo eliminado:", archivo.Name())
+		}
+	}
+
+	//eliminacion de reportes
+	carpetaReportes := "./MIA/Reportes"
+	//abre la carpeta
+	directorio, err = os.Open(carpetaReportes)
+	if err != nil {
+		fmt.Println("Error al abrir la carpeta:", err)
+		return
+	}
+	defer directorio.Close()
+
+	// Lee los archivos de la carpeta
+	archivos, err = directorio.Readdir(0)
+	if err != nil {
+		fmt.Println("Error al leer archivos de la carpeta:", err)
+		return
+	}
+
+	// Elimina cada archivo
+	for _, archivo := range archivos {
+		rutaArchivo := carpetaReportes + "/" + archivo.Name()
+		err := os.Remove(rutaArchivo)
+		if err != nil {
+			fmt.Println("Error al eliminar el archivo", archivo.Name(), ":", err)
+		} else {
+			fmt.Println("Archivo eliminado:", archivo.Name())
+		}
+	}
+
+	//cierra sesion del usuario global (si estuviera con sesion activa)
+	if Structs.UsuarioActual.Status {
+		US.Logout()
+	}
+
+	respuestaJSON, err := json.Marshal(1)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error al serializar datos a JSON: %s", err), http.StatusInternalServerError)
+		return
+	}
+	w.Write(respuestaJSON)
 }

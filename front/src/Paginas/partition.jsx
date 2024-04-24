@@ -17,6 +17,11 @@ export default function Partitions(){
         })
         .then(Response => Response.json())
         .then(rawData => {console.log(rawData); setParticiones(rawData);})
+        .catch(error => {
+            console.error('Error en la solicitud Fetch:', error);
+            // Maneja el error aquí, como mostrar un mensaje al usuario
+            //alert('Error en la solicitud Fetch. Por favor, inténtalo de nuevo más tarde.');
+        });
     }, [])
 
     const onClick = (particion) => {

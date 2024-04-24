@@ -12,29 +12,39 @@ export default function Navegador(){
 
     const logOut = (e) => {
         e.preventDefault()
-        const data = {
-            text: "logout"
-        };
-
-        fetch('http://localhost:8080/logout', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json'},
-            body: JSON.stringify(data)
-        })
+        
+        fetch('http://localhost:8080/logout')
         .then(Response => Response.json())
         .then(rawData => {
-            console.log(rawData); 
+            console.log(rawData);  
             if (rawData === 0){
                 alert('sesion cerrada')
+                window.location.href = '#/Discos';
             }else{
                 alert('No hay sesion abierta')
             }
         }) 
+        .catch(error => {
+            console.error('Error en la solicitud Fetch:', error);
+            // Maneja el error aquí, como mostrar un mensaje al usuario
+            //alert('Error en la solicitud Fetch. Por favor, inténtalo de nuevo más tarde.');
+        });
     };
 
     const limpiar = (e) => {
         e.preventDefault()
-        //fetch('http://localhost:8080/limpiar')
+        console.log("limpiando")
+        fetch('http://localhost:8080/limpiar')
+        .then(Response => Response.json())
+        .then(rawData => {
+            console.log(rawData); 
+            if (rawData === 1){
+                alert('Discos y reportes eliminados')
+                window.location.href = '#/Comandos';
+            }else{
+                alert('Error al eliminar archiovs')
+            }
+        }) 
     }
 
     return(

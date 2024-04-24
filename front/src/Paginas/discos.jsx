@@ -12,6 +12,11 @@ export default function Discos(){
         fetch('http://localhost:8080/discos')
         .then(Response => Response.json())
         .then(rawData => {console.log(rawData); setDiscos(rawData);})
+        .catch(error => {
+            console.error('Error en la solicitud Fetch:', error);
+            // Maneja el error aquí, como mostrar un mensaje al usuario
+            //alert('Error en la solicitud Fetch. Por favor, inténtalo de nuevo más tarde.');
+        });
     }, [])
 
     const onClick = (disco) => {

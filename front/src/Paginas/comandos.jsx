@@ -29,6 +29,7 @@ export default function Comandos(){
     
             const responseData = await response.json();
             console.log('Respuesta del servidor:', responseData);
+            alert("Comandos ejecutados")
         } catch (error) {
             console.error('Error:', error);
         }
