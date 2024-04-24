@@ -6,6 +6,7 @@ import Discos from '../Paginas/discos';
 import Partitions from '../Paginas/partition';
 import Login from '../Paginas/login';
 import Explorer from '../Paginas/explorador';
+import Reportes from '../Paginas/reportes';
 
 export default function Navegador(){
 
@@ -30,6 +31,11 @@ export default function Navegador(){
             }
         }) 
     };
+
+    const limpiar = (e) => {
+        e.preventDefault()
+        //fetch('http://localhost:8080/limpiar')
+    }
 
     return(
         <HashRouter>
@@ -59,11 +65,20 @@ export default function Navegador(){
                                 </li>
 
                                 <li className="nav-item">
+                                    {/* Enlaza primero a discos porque el flujo es empezar por discos luego particiones y luego el sistema de archivos */}
                                     <Link className="nav-link" to="/Discos">Explorador</Link>
                                 </li>
 
                                 <li className="nav-item">
                                     <button onClick={logOut} className="nav-link">Logout</button>
+                                </li>
+
+                                <li className="nav-item">
+                                    <Link className="nav-link" to="/Reportes">Reportes</Link>
+                                </li>
+
+                                <li className="nav-item">
+                                    <button onClick={limpiar} className="nav-link">Limpiar</button>
                                 </li>
 
                             </ul>{/*Fin de lista de menus*/}
@@ -78,7 +93,8 @@ export default function Navegador(){
                 <Route path="/Discos" element ={<Discos/>}/> 
                 <Route path="/Disco/:id" element ={<Partitions/>}/> 
                 <Route path="/Login/:disk/:part" element ={<Login/>}/>
-                <Route path="/Explorador/:id" element ={<Explorer/>}/>                 
+                <Route path="/Explorador/:id" element ={<Explorer/>}/>
+                <Route path="/Reportes" element ={<Reportes/>}/>                 
             </Routes>
         </HashRouter>
 

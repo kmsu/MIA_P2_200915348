@@ -13,6 +13,7 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -47,6 +48,9 @@ func main() {
 	http.HandleFunc("/contenido", getContenidoR)
 	http.HandleFunc("/file", getFile)
 	http.HandleFunc("/back", getBack)
+	http.HandleFunc("/reportes", getReportes)
+	http.HandleFunc("/descargar", getDescarga)
+	http.HandleFunc("/limpiar", getLimpieza)
 
 	// Configurar CORS con opciones predeterminadas
 	c := cors.Default()
@@ -631,4 +635,82 @@ func getBack(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Write(respuestaJSON)
+}
+
+func getReportes(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("reportes")
+	// Configurar la cabecera de respuesta
+	w.Header().Set("Content-Type", "application/json")
+
+	directorio := "./MIA/Reportes"
+	//lista de discos encontrados
+	var discos []string
+
+	//recorrer el directorio y buscar discos
+	err := filepath.Walk(directorio, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() {
+			if strings.HasSuffix(info.Name(), ".png") {
+				discos = append(discos, info.Name())
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error al buscar archivos: %s", err), http.StatusInternalServerError)
+	}
+
+	respuestaJSON, err := json.Marshal(discos)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error al serializar datos a JSON: %s", err), http.StatusInternalServerError)
+		return
+	}
+	w.Write(respuestaJSON)
+}
+
+func getDescarga(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("file")
+	// Configurar la cabecera de respuesta
+	w.Header().Set("Content-Type", "application/json")
+
+	var entrada string
+	if err := json.NewDecoder(r.Body).Decode(&entrada); err != nil {
+		http.Error(w, "Error al decodificar JSON", http.StatusBadRequest)
+		return
+	}
+
+	directorio := "./MIA/Reportes/"
+	fmt.Println("Buscar ", directorio)
+
+	//abrir el archivo
+	file, err := http.Dir(directorio).Open(entrada)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("No se puede abrir el archivo %s para leer: %v", entrada, err), http.StatusInternalServerError)
+		return
+	}
+	defer file.Close()
+
+	//configurar cabeceras
+	// Establecer la cabecera HTTP
+	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", entrada))
+	w.Header().Set("Content-Type", "application/octet-stream")
+	w.Header().Set("Content-Transfer-Encoding", "binary")
+	w.Header().Set("Expires", "0")
+	w.Header().Set("Cache-Control", "must-revalidate")
+	w.Header().Set("Pragma", "public")
+
+	// Copiar el archivo al cuerpo de la respuesta
+	_, err = io.Copy(w, file)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error al copiar el archivo al cuerpo de la respuesta: %v", err), http.StatusInternalServerError)
+		return
+	}
+}
+
+func getLimpieza(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("limpieza")
+	// Configurar la cabecera de respuesta
+	w.Header().Set("Content-Type", "application/json")
 }

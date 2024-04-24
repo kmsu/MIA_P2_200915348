@@ -63,7 +63,6 @@ export default function Explorer(){
         <>
             <div className="container">
                 <div className="d-flex justify-content-center">
-                    
                     <div className="explorer-card">
                         <div className="explorer-card-header">
                             <img onClick={back} src={volver} alt="volver" style={{width: "20px", margin: "5px"}} />
