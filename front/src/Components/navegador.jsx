@@ -1,4 +1,5 @@
 import { Routes, Route, HashRouter, Link } from 'react-router-dom'
+import { useState } from 'react';
 
 import hacker from '../iconos/hacker.gif';
 import Comandos from '../Paginas/comandos';
@@ -9,11 +10,18 @@ import Explorer from '../Paginas/explorador';
 import Reportes from '../Paginas/reportes';
 
 export default function Navegador(){
-
+    const [ ip, setIP ] = useState("localhost")
+    
+    //handleChange sirve para poner valor por cada cambio que detecte
+    const handleChange = (e) => {
+        console.log(e.target.value)
+        setIP(e.target.value)
+    }
+    
     const logOut = (e) => {
         e.preventDefault()
         
-        fetch('http://localhost:8080/logout')
+        fetch(`http://${ip}:8080/logout`)
         .then(Response => Response.json())
         .then(rawData => {
             console.log(rawData);  
@@ -34,7 +42,7 @@ export default function Navegador(){
     const limpiar = (e) => {
         e.preventDefault()
         console.log("limpiando")
-        fetch('http://localhost:8080/limpiar')
+        fetch(`http://${ip}:8080/limpiar`)
         .then(Response => Response.json())
         .then(rawData => {
             console.log(rawData); 
@@ -90,24 +98,22 @@ export default function Navegador(){
                                 <li className="nav-item">
                                     <button onClick={limpiar} className="nav-link">Limpiar</button>
                                 </li>
-
                             </ul>{/*Fin de lista de menus*/}
                         </div>{/*Fila de menus en la barra de navegacion*/}
                     </div>{/*Fila Titulo*/}
                 </div>{/*Cierro tercer columna (Menu)*/}
+                <input className="form-control me-2 mx-auto" style={{ maxWidth: "200px" }} placeholder="IP" onChange={handleChange}/>
             </nav> 
             
             <Routes>
-                <Route path="/" element ={<Comandos/>}/> {/*home*/}
-                <Route path="/Comandos" element ={<Comandos/>}/> 
-                <Route path="/Discos" element ={<Discos/>}/> 
-                <Route path="/Disco/:id" element ={<Partitions/>}/> 
-                <Route path="/Login/:disk/:part" element ={<Login/>}/>
-                <Route path="/Explorador/:id" element ={<Explorer/>}/>
-                <Route path="/Reportes" element ={<Reportes/>}/>                 
+                <Route path="/" element ={<Comandos newIp={ip}/>}/> {/*home*/}
+                <Route path="/Comandos" element ={<Comandos newIp={ip}/>}/> 
+                <Route path="/Discos" element ={<Discos newIp={ip}/>}/> 
+                <Route path="/Disco/:id" element ={<Partitions newIp={ip}/>}/> 
+                <Route path="/Login/:disk/:part" element ={<Login newIp={ip}/>}/>
+                <Route path="/Explorador/:id" element ={<Explorer newIp={ip}/>}/>
+                <Route path="/Reportes" element ={<Reportes newIp={ip}/>}/>                 
             </Routes>
         </HashRouter>
-
-        
     );
 }

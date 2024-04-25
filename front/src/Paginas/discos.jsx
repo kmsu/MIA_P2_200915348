@@ -4,12 +4,12 @@ import { useNavigate } from "react-router-dom"
 import diskIMG from '../iconos/disk.png';
 import "../StyleSheets/fondo.css"
 
-export default function Discos(){
+export default function Discos({newIp="localhost"}){
     const [discos, setDiscos] = useState([]);
     const navigate = useNavigate()
 
     useState(()=>{
-        fetch('http://localhost:8080/discos')
+        fetch(`http://${newIp}:8080/discos`)
         .then(Response => Response.json())
         .then(rawData => {console.log(rawData); setDiscos(rawData);})
     }, [])
@@ -44,9 +44,7 @@ export default function Discos(){
                 ):(
                     <div>No hay discos disponibles</div>
                 )}
-
             </div> 
         </div>
-        
     );
 }

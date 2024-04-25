@@ -169,7 +169,7 @@ func Mkfile(parametros []string) {
 			//verificar que no exista el archivo (recordar que BuscarInodo busca de la forma /nombreBuscar)
 			idNuevo := HerramientasInodos.BuscarInodo(idInicial, "/"+stepPath[finRuta], superBloque, disco)
 			if idNuevo == idInicial {
-				fmt.Println("El archivo no existe")
+				fmt.Println("Crear el archivo")
 				//si el parametro cont no viene crear con digitos 0-9
 				if cont == "" {
 					crearArchivo(idInicial, stepPath[finRuta], size, "", int64(mbr.Partitions[part].Start), disco)

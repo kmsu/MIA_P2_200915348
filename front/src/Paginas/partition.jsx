@@ -4,13 +4,13 @@ import { useNavigate } from "react-router-dom"
 import partIMG from '../iconos/part.png';
 import "../StyleSheets/fondo.css"
 
-export default function Partitions(){
+export default function Partitions({newIp="localhost"}){
     const { id } = useParams()
     const [ particiones, setParticiones ] = useState([]);
     const navigate = useNavigate()
     
     useState(()=>{
-        fetch('http://localhost:8080/particiones', {
+        fetch(`http://${newIp}:8080/particiones`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json'},
             body: JSON.stringify(id)

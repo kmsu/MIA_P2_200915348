@@ -5,13 +5,13 @@ import carpeta from '../iconos/carpeta.png';
 import volver from '../iconos/volver.png';
 import "../StyleSheets/explorer.css"
 
-export default function Explorer(){
+export default function Explorer({newIp="localhost"}){
     const [ archivos, setArchivos ] = useState([]);
     const [ estado, setEstado ] = useState(true); //para evitar que muestre imagen cuando es cocntenido de archivo
     const [ path, setPath ] = useState("path: /");
 
     useState(()=>{
-        fetch('http://localhost:8080/explorer')
+        fetch(`http://${newIp}:8080/explorer`)
         .then(Response => Response.json())
         .then(rawData => {console.log(rawData); setArchivos(rawData);})
         .catch(error => {
@@ -25,7 +25,7 @@ export default function Explorer(){
         console.log("buscar",archivo)
         let tmp = path+archivo+"/"
         setPath(tmp)
-        fetch('http://localhost:8080/contenido', {
+        fetch(`http://${newIp}:8080/contenido`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json'},
             body: JSON.stringify(archivo)
@@ -39,7 +39,7 @@ export default function Explorer(){
         let tmp = path+archivo+"/"
         setPath(tmp)
         setEstado(false)
-        fetch('http://localhost:8080/file', {
+        fetch(`http://${newIp}:8080/file`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json'},
             body: JSON.stringify(archivo)
@@ -58,7 +58,7 @@ export default function Explorer(){
             console.log("back ", newPath)
             setPath(newPath)
             setEstado(true) //por si estaba mostrando contenido de un archivo
-            fetch('http://localhost:8080/back')
+            fetch(`http://${newIp}:8080/back`)
             .then(Response => Response.json())
             .then(rawData => {console.log(rawData); setArchivos(rawData);})
         }
@@ -109,7 +109,6 @@ export default function Explorer(){
                             ):(
                                 <div>No hay archivos disponibles</div>
                             )}
-                            
                         </div>
                     </div>
                 </div>

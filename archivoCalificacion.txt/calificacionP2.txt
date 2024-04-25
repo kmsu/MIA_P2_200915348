@@ -49,7 +49,7 @@ mkfs -type=full -id=A148 -fs=2fs
 #LOGIN------------------------------------------------
 login -user=root -pass=123 -id=A148
 
-CREACION DE CARPETAS------------------------------------------------
+#CREACION DE CARPETAS------------------------------------------------
 
 mkdir -r -path="/calificacion/U 2024/9no Semestre" #RECURSIVO
 

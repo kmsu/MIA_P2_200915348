@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import "../StyleSheets/comandos.css"
 
-export default function Comandos(){
+export default function Comandos({newIp="localhost"}){
     const [textValue, setTextValue] = useState('');
 
     const handleTextChange = (event) => {
@@ -15,7 +15,7 @@ export default function Comandos(){
         };
         
         try {
-            const response = await fetch('http://localhost:8080/analizar', {
+            const response = await fetch(`http://${newIp}:8080/analizar`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -39,7 +39,6 @@ export default function Comandos(){
     return(
         <div className='contenedorEjecutar'>
             <div id="espacio">&nbsp;&nbsp;&nbsp;</div>
-
             <table>
                 <tbody>
                     <tr>

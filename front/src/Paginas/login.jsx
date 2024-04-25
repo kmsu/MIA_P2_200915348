@@ -5,7 +5,7 @@ import "../StyleSheets/login.css"
 import user from '../iconos/profile.png';
 import key from '../iconos/key.png';
 
-export default function Login(){
+export default function Login({newIp="localhost"}){
     const { disk, part } = useParams()
     const [ estado, setEstado ] = useState();
     const navigate = useNavigate()
@@ -25,7 +25,7 @@ export default function Login(){
             id: part
         };
 
-        fetch('http://localhost:8080/login', {
+        fetch(`http://${newIp}:8080/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json'},
             body: JSON.stringify(data)
@@ -105,17 +105,3 @@ export default function Login(){
         </>
     )
 }
-
-{/**{estado  === -1 ? (
-                                    onClick(part)
-                                ):estado === 0 ? (
-                                    <div>Ya existe sesion activa</div>
-                                ):estado === 2 ?(
-                                    <div>Particion sin formato</div>
-                                ):estado === 3 ?(
-                                    <div>Contraseña incorrecta</div>
-                                ):estado === 4 ?(
-                                    <div>No se encontro el usuario</div>
-                                ):(
-                                    <div></div>
-                                )} */}

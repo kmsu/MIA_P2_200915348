@@ -4,11 +4,11 @@ import { useNavigate } from "react-router-dom"
 import diskIMG from '../iconos/png.png';
 import "../StyleSheets/fondo.css"
 
-export default function Reportes(){
+export default function Reportes({newIp="localhost"}){
     const [reportes, setReportes] = useState([]);
 
     useState(()=>{
-        fetch('http://localhost:8080/reportes')
+        fetch(`http://${newIp}:8080/reportes`)
         .then(Response => Response.json())
         .then(rawData => {console.log(rawData); setReportes(rawData);})
     }, [])
@@ -16,7 +16,7 @@ export default function Reportes(){
     const onClick = (repo) => {
         console.log("click",repo)
         //setEstado(true)
-        fetch('http://localhost:8080/descargar', {
+        fetch(`http://${newIp}:8080/descargar`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json'},
             body: JSON.stringify(repo)
