@@ -28,3 +28,9 @@ root.render(<App />);
 
 para la navegacion entre paginas instalar en la carpeta del front
 npm i react-router-dom 
+
+//Instalacion de graphiz
+sudo apt install graphviz
+
+//dentro de la carpeta del proyecto ejecutar
+go get -u github.com/goccy/go-graphviz
