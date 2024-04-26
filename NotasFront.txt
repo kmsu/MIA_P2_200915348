@@ -34,3 +34,6 @@ sudo apt install graphviz
 
 //dentro de la carpeta del proyecto ejecutar
 go get -u github.com/goccy/go-graphviz
+
+al subirlo si da error de formato go mod 1.22 por 1.23
+en el go.mod modificar el go.1.22.2 por 1.22 en la ec2
