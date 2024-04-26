@@ -103,6 +103,7 @@ export default function Navegador(){
                     </div>{/*Fila Titulo*/}
                 </div>{/*Cierro tercer columna (Menu)*/}
                 <input className="form-control me-2 mx-auto" style={{ maxWidth: "200px" }} placeholder="IP" onChange={handleChange}/>
+                <div id="espacio">&nbsp;</div>
             </nav> 
             
             <Routes>
