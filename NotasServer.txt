@@ -1,0 +1,3 @@
+instalar mod: init go.mod -> Esto es para usar archivos separados
+
+instalar cors: go get -u github.com/rs/cors

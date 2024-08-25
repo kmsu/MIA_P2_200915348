@@ -19,6 +19,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	//instalar cors: go get -u github.com/rs/cors
 	"github.com/rs/cors"
 )
 
